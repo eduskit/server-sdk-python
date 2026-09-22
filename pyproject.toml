@@ -1,15 +1,17 @@
 [project]
 name = "eduskit"
-version = "0.1.1"
+version = "0.1.2"
 description = "Eduskit B-end server SDK for classroom and whiteboard APIs"
 requires-python = ">=3.9"
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [{ name = "Eduskit" }]
 classifiers = ["Programming Language :: Python :: 3"]
 urls = { Repository = "https://github.com/eduskit/server-sdk-python" }
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
