@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urlencode
+
 from typing import Any
 
 from .http import HttpTransport
@@ -30,41 +32,41 @@ class _Recordings:
         self._http = http
 
     def start(self, room_id: str, **input: Any) -> Any:
-        return self._http.request("POST", f"/v1/rooms/{room_id}/recording/start", input)
+        return self._http.request("POST", '/v1/rooms/recording/start', {**(input or {}), 'roomId': room_id})
 
     def stop(self, room_id: str, **input: Any) -> Any:
-        return self._http.request("POST", f"/v1/rooms/{room_id}/recording/stop", input)
+        return self._http.request("POST", '/v1/rooms/recording/stop', {**(input or {}), 'roomId': room_id})
 
     def list(self, room_id: str) -> Any:
-        return self._http.request("GET", f"/v1/rooms/{room_id}/recordings")
+        return self._http.request("GET", '/v1/rooms/recordings' + "?" + urlencode({'roomId': room_id}))
 
     def get(self, recording_id: str) -> Any:
-        return self._http.request("GET", f"/v1/recordings/{recording_id}")
+        return self._http.request("GET", '/v1/recordings' + "?" + urlencode({'recordingId': recording_id}))
 
     def register_media_asset(self, recording_id: str, **input: Any) -> Any:
         return self._http.request(
             "POST",
-            f"/v1/recordings/{recording_id}/media-assets",
-            input,
+            '/v1/recordings/media-assets',
+            {**(input or {}), 'recordingId': recording_id},
         )
 
     def delete_media_asset(self, recording_id: str, asset_id: str) -> Any:
         return self._http.request(
             "DELETE",
-            f"/v1/recordings/{recording_id}/media-assets/{asset_id}",
+            '/v1/recordings/media-assets' + "?" + urlencode({'recordingId': recording_id, 'assetId': asset_id}),
         )
 
     def enqueue_video_export(self, recording_id: str, **input: Any) -> Any:
         return self._http.request(
             "POST",
-            f"/v1/recordings/{recording_id}/video-exports",
-            input,
+            '/v1/recordings/video-exports',
+            {**(input or {}), 'recordingId': recording_id},
         )
 
     def get_video_export(self, recording_id: str, job_id: str) -> Any:
         return self._http.request(
             "GET",
-            f"/v1/recordings/{recording_id}/video-exports/{job_id}",
+            '/v1/recordings/video-exports' + "?" + urlencode({'recordingId': recording_id, 'jobId': job_id}),
         )
 
 
@@ -74,10 +76,10 @@ class _Captures:
 
     def create(self, room_id: str, **input: Any) -> Any:
         body = {"roomId": room_id, **input}
-        return self._http.request("POST", f"/v1/rooms/{room_id}/captures", body)
+        return self._http.request("POST", '/v1/rooms/captures', {**(body or {}), 'roomId': room_id})
 
     def list(self, room_id: str) -> Any:
-        return self._http.request("GET", f"/v1/rooms/{room_id}/captures")
+        return self._http.request("GET", '/v1/rooms/captures' + "?" + urlencode({'roomId': room_id}))
 
 
 class _Files:
@@ -88,7 +90,7 @@ class _Files:
         return self._http.request("POST", "/v1/files/convert", input)
 
     def get_convert_job(self, job_id: str) -> Any:
-        return self._http.request("GET", f"/v1/files/convert/{job_id}")
+        return self._http.request("GET", '/v1/files/convert' + "?" + urlencode({'jobId': job_id}))
 
 
 class WhiteboardClient:

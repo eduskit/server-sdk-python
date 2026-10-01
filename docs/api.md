@@ -1,25 +1,25 @@
 # API 方法表
 
-语义方法与 HTTP 的对应关系。各语言命名见各包 README（Python 为 snake_case，Go 为 PascalCase）。
+语义方法与 HTTP 的对应关系。GET/DELETE 的标识放 query；POST/PUT/PATCH 的标识与业务字段放 JSON body。SDK 将方法的 ID 参数写入相应位置，对外方法签名不变。各语言命名见各包 README（Python 为 snake_case，Go 为 PascalCase）。
 
 ## `client`（课堂）
 
 | 方法 | HTTP | 说明 |
 |------|------|------|
 | `users.register` | `POST /v1/users` | 注册或按 `originId` 幂等更新 C 端用户 |
-| `auth.issueToken` | 本地 | 为已注册用户签发 C 端 accessToken，不发 HTTP |
+| `auth.issueToken` | `LOCAL HS256 (eduskit-edu)` | 为已注册用户签发 C 端 accessToken，不发 HTTP |
 | `classrooms.create` | `POST /v1/classrooms` | 创建课堂 |
-| `classrooms.start` | `POST /v1/classrooms/{id}/start` | 开课 |
-| `classrooms.end` | `POST /v1/classrooms/{id}/end` | 结课 |
-| `classrooms.members.add` | `POST /v1/classrooms/{id}/members` | 添加成员 |
-| `classrooms.members.list` | `GET /v1/classrooms/{id}/members` | 列出成员 |
-| `classrooms.members.replaceStudents` | `PUT /v1/classrooms/{id}/members/students` | 全量替换学生花名册 |
-| `classrooms.permissions.get` | `GET .../members/{eduUserId}/permissions` | 查询成员权限 |
-| `classrooms.permissions.set` | `POST .../members/{eduUserId}/permissions` | 代老师 grant/revoke |
-| `classrooms.permissions.clear` | `DELETE .../permissions/{permission}` | 清除权限覆盖 |
-| `classrooms.coursewares.list` | `GET /v1/classrooms/{id}/coursewares` | 列出已绑定课件 |
-| `classrooms.coursewares.bind` | `POST /v1/classrooms/{id}/coursewares` | 绑定课件（幂等） |
-| `classrooms.coursewares.unbind` | `DELETE /v1/classrooms/{id}/coursewares` | 解绑课件 |
+| `classrooms.start` | `POST /v1/classrooms/start` | 开课 |
+| `classrooms.end` | `POST /v1/classrooms/end` | 结课 |
+| `classrooms.members.add` | `POST /v1/classrooms/members` | 添加成员 |
+| `classrooms.members.list` | `GET /v1/classrooms/members` | 列出成员 |
+| `classrooms.members.replaceStudents` | `PUT /v1/classrooms/members/students` | 全量替换学生花名册 |
+| `classrooms.permissions.get` | `GET /v1/classrooms/members/permissions` | 查询成员权限 |
+| `classrooms.permissions.set` | `POST /v1/classrooms/members/permissions` | 代老师 grant/revoke |
+| `classrooms.permissions.clear` | `DELETE /v1/classrooms/members/permissions` | 清除权限覆盖 |
+| `classrooms.coursewares.list` | `GET /v1/classrooms/coursewares` | 列出已绑定课件 |
+| `classrooms.coursewares.bind` | `POST /v1/classrooms/coursewares` | 绑定课件（幂等） |
+| `classrooms.coursewares.unbind` | `DELETE /v1/classrooms/coursewares` | 解绑课件 |
 | `app.getUiConfig` | `GET /v1/app/ui-config` | 获取 App UI |
 | `app.setUiConfig` | `PUT /v1/app/ui-config` | 设置 App UI（不影响已创建课堂快照） |
 
@@ -50,19 +50,19 @@
 
 | 方法 | HTTP | 说明 |
 |------|------|------|
-| `auth.issueRoomToken` | 本地 | 签发 Room Token，不发 HTTP |
-| `recordings.start` | `POST /v1/rooms/{roomId}/recording/start` | 开始录制 |
-| `recordings.stop` | `POST /v1/rooms/{roomId}/recording/stop` | 停止录制（不自动出片） |
-| `recordings.list` | `GET /v1/rooms/{roomId}/recordings` | 列出房间录制 |
-| `recordings.get` | `GET /v1/recordings/{recordingId}` | 录制详情 |
-| `recordings.registerMediaAsset` | `POST /v1/recordings/{id}/media-assets` | 登记媒体 URL |
-| `recordings.deleteMediaAsset` | `DELETE .../media-assets/{assetId}` | 删除媒体资产 |
-| `recordings.enqueueVideoExport` | `POST /v1/recordings/{id}/video-exports` | 入队视频导出 |
-| `recordings.getVideoExport` | `GET .../video-exports/{jobId}` | 查询导出任务 |
-| `captures.create` | `POST /v1/rooms/{roomId}/captures` | 创建页截图 |
-| `captures.list` | `GET /v1/rooms/{roomId}/captures` | 列出截图 |
+| `auth.issueRoomToken` | `LOCAL HS256 (eduskit-room)` | 签发 Room Token，不发 HTTP |
+| `recordings.start` | `POST /v1/rooms/recording/start` | 开始录制 |
+| `recordings.stop` | `POST /v1/rooms/recording/stop` | 停止录制（不自动出片） |
+| `recordings.list` | `GET /v1/rooms/recordings` | 列出房间录制 |
+| `recordings.get` | `GET /v1/recordings` | 录制详情 |
+| `recordings.registerMediaAsset` | `POST /v1/recordings/media-assets` | 登记媒体 URL |
+| `recordings.deleteMediaAsset` | `DELETE /v1/recordings/media-assets` | 删除媒体资产 |
+| `recordings.enqueueVideoExport` | `POST /v1/recordings/video-exports` | 入队视频导出 |
+| `recordings.getVideoExport` | `GET /v1/recordings/video-exports` | 查询导出任务 |
+| `captures.create` | `POST /v1/rooms/captures` | 创建页截图 |
+| `captures.list` | `GET /v1/rooms/captures` | 列出截图 |
 | `files.convert` | `POST /v1/files/convert` | 提交转码 |
-| `files.getConvertJob` | `GET /v1/files/convert/{jobId}` | 查询转码任务 |
+| `files.getConvertJob` | `GET /v1/files/convert` | 查询转码任务 |
 
 ### 常用入参
 

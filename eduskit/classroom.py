@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import urlencode
+
 from typing import Any
 
 from .http import HttpTransport
@@ -42,16 +44,16 @@ class _Members:
         self._http = http
 
     def add(self, classroom_id: str, **input: Any) -> Any:
-        return self._http.request("POST", f"/v1/classrooms/{classroom_id}/members", input)
+        return self._http.request("POST", '/v1/classrooms/members', {**(input or {}), 'classroomId': classroom_id})
 
     def list(self, classroom_id: str) -> Any:
-        return self._http.request("GET", f"/v1/classrooms/{classroom_id}/members")
+        return self._http.request("GET", '/v1/classrooms/members' + "?" + urlencode({'classroomId': classroom_id}))
 
     def replace_students(self, classroom_id: str, **input: Any) -> Any:
         return self._http.request(
             "PUT",
-            f"/v1/classrooms/{classroom_id}/members/students",
-            input,
+            '/v1/classrooms/members/students',
+            {**(input or {}), 'classroomId': classroom_id},
         )
 
 
@@ -62,14 +64,14 @@ class _Permissions:
     def get(self, classroom_id: str, edu_user_id: str) -> Any:
         return self._http.request(
             "GET",
-            f"/v1/classrooms/{classroom_id}/members/{edu_user_id}/permissions",
+            '/v1/classrooms/members/permissions' + "?" + urlencode({'classroomId': classroom_id, 'eduUserId': edu_user_id}),
         )
 
     def set(self, classroom_id: str, edu_user_id: str, **input: Any) -> Any:
         return self._http.request(
             "POST",
-            f"/v1/classrooms/{classroom_id}/members/{edu_user_id}/permissions",
-            input,
+            '/v1/classrooms/members/permissions',
+            {**(input or {}), 'classroomId': classroom_id, 'eduUserId': edu_user_id},
         )
 
     def clear(
@@ -81,7 +83,7 @@ class _Permissions:
     ) -> Any:
         return self._http.request(
             "DELETE",
-            f"/v1/classrooms/{classroom_id}/members/{edu_user_id}/permissions/{permission}",
+            '/v1/classrooms/members/permissions' + "?" + urlencode({'classroomId': classroom_id, 'eduUserId': edu_user_id, 'permission': permission}),
             input,
         )
 
@@ -91,19 +93,19 @@ class _Coursewares:
         self._http = http
 
     def list(self, classroom_id: str) -> Any:
-        return self._http.request("GET", f"/v1/classrooms/{classroom_id}/coursewares")
+        return self._http.request("GET", '/v1/classrooms/coursewares' + "?" + urlencode({'classroomId': classroom_id}))
 
     def bind(self, classroom_id: str, **input: Any) -> Any:
         return self._http.request(
             "POST",
-            f"/v1/classrooms/{classroom_id}/coursewares",
-            input,
+            '/v1/classrooms/coursewares',
+            {**(input or {}), 'classroomId': classroom_id},
         )
 
     def unbind(self, classroom_id: str, **input: Any) -> Any:
         return self._http.request(
             "DELETE",
-            f"/v1/classrooms/{classroom_id}/coursewares",
+            '/v1/classrooms/coursewares' + "?" + urlencode({'classroomId': classroom_id}),
             input,
         )
 
@@ -119,10 +121,10 @@ class _Classrooms:
         return self._http.request("POST", "/v1/classrooms", input)
 
     def start(self, classroom_id: str) -> Any:
-        return self._http.request("POST", f"/v1/classrooms/{classroom_id}/start")
+        return self._http.request("POST", '/v1/classrooms/start', {'classroomId': classroom_id})
 
     def end(self, classroom_id: str) -> Any:
-        return self._http.request("POST", f"/v1/classrooms/{classroom_id}/end")
+        return self._http.request("POST", '/v1/classrooms/end', {'classroomId': classroom_id})
 
 
 class _App:
