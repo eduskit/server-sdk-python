@@ -14,6 +14,10 @@
 
 本地 JWT 固定使用 HS256，并分别绑定 `eduskit-edu` / `eduskit-room` audience。`appSecret` 只能保存在客户后端，禁止下发到浏览器、App 或小程序。
 
+本地 Room Token 包含必填 `access_generation: null`，用于共享房间。私有教学作品需要由
+白板 auth-svc 从当前未撤销授权签发 generation；本地方法不查询授权，也不接受调用者指定
+私有 generation。缺失此字段的 JWT 会被服务端拒绝。私有作品的业务签发入口仍在开发。
+
 ## 语言包
 
 | 语言 | 文档 | 包名 |
@@ -33,7 +37,7 @@
 - 白板成功体可能没有 `traceId`，SDK 会从响应头 `x-trace-id` 回填到 `lastTraceId`。
 - 失败抛 `EduskitError`：`status`、`errorCode`、`message`、`traceId`、`path`、`source`（`classroom` / `whiteboard`）。
 - 未配置的一侧被访问时立即抛 `SDK_CLIENT_NOT_CONFIGURED`，不发请求。
-- 不在 HTTP Body 传 `appId`；配置中的 `appId` 只用于本地签 Token。
+- 不在 HTTP Body 传 `appId`；配置中的 `appId` 用于本地共享房间签名及响应归属检查。私有房间 token 使用 HTTP 读取当前授权，见 [私有房间 API](api.md#私有教学白板与固定作品)。
 - v1 不做自动重试（`start` / `end` / 开录等非幂等）。
 
 ## 不做

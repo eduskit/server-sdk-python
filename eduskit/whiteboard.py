@@ -21,7 +21,7 @@ class _Auth:
         expires_in = input.get("expiresIn", 3600)
         token, expires_at = sign_hs256(self._app_id, self._app_secret, user_id,
             "eduskit", "eduskit-room", expires_in,
-            {"app_id": self._app_id, "room_id": room_id, "role": role, "source": "server_sdk"},
+            {"app_id": self._app_id, "room_id": room_id, "role": role, "source": "server_sdk", "access_generation": None},
             "whiteboard")
         return {"token": token, "appId": self._app_id, "roomId": room_id, "userId": user_id,
                 "role": role, "expiresIn": expires_in, "expiresAt": iso_time(expires_at)}
@@ -93,12 +93,54 @@ class _Files:
         return self._http.request("GET", '/v1/files/convert' + "?" + urlencode({'jobId': job_id}))
 
 
+class _Rooms:
+    def __init__(self, http: HttpTransport) -> None:
+        self._http = http
+
+    def schedule_private_room_writes(self, room_id: str, request_id: str, opens_at: str, closes_at: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/write-window", {"roomId": room_id, "requestId": request_id, "opensAt": opens_at, "closesAt": closes_at})
+
+    def provision_private_room(self, room_id: str, assignment_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private", {"roomId": room_id, "assignmentId": assignment_id})
+
+    def initialize_private_workspace(self, room_id: str, assignment_id: str, source_snapshot_id: str | None) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/initializations", {"roomId": room_id, "assignmentId": assignment_id, "sourceSnapshotId": source_snapshot_id})
+
+    def get_private_workspace_initialization(self, room_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/initializations/query", {"roomId": room_id})
+
+    def change_private_room_grant(self, room_id: str, **input: Any) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/grants", {**input, "roomId": room_id})
+
+    def get_private_room_access(self, room_id: str, user_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/access/query", {"roomId": room_id, "userId": user_id})
+
+    def issue_private_room_token(self, room_id: str, **input: Any) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/token", {**input, "roomId": room_id})
+
+    def seal_private_room(self, room_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/seal", {"roomId": room_id})
+
+    def create_frozen_snapshot(self, room_id: str, snapshot_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/snapshots", {"roomId": room_id, "snapshotId": snapshot_id})
+
+    def get_frozen_snapshot(self, room_id: str, snapshot_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/snapshots/query", {"roomId": room_id, "snapshotId": snapshot_id})
+
+    def get_frozen_snapshot_download(self, room_id: str, snapshot_id: str) -> Any:
+        return self._http.request("POST", "/v1/rooms/private/snapshots/download", {"roomId": room_id, "snapshotId": snapshot_id})
+
+    def attach_courseware(self, room_id: str, **input: Any) -> Any:
+        return self._http.request("POST", "/v1/rooms/coursewares", {**input, "roomId": room_id})
+
+
 class WhiteboardClient:
     def __init__(self, http: HttpTransport, *, app_id: str, app_secret: str) -> None:
         self.auth = _Auth(app_id, app_secret)
         self.recordings = _Recordings(http)
         self.captures = _Captures(http)
         self.files = _Files(http)
+        self.rooms = _Rooms(http)
         self._http = http
 
     @property
